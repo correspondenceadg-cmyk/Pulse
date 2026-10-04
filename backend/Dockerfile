@@ -1,10 +1,10 @@
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
-COPY pom.xml .
+COPY backend/pom.xml .
 RUN mvn -B -ntp dependency:go-offline
 
-COPY src ./src
+COPY backend/src ./src
 RUN mvn -B -ntp package -DskipTests
 
 FROM eclipse-temurin:21-jre-jammy
@@ -19,7 +19,7 @@ USER pulse
 EXPOSE 8080
 
 ENTRYPOINT ["java", \
-"-XX:MaxRAMPercentage=70", \
-"-XX:+UseSerialGC", \
-"-Djava.security.egd=file:/dev/./urandom", \
-"-jar", "app.jar"]
+  "-XX:MaxRAMPercentage=70", \
+  "-XX:+UseSerialGC", \
+  "-Djava.security.egd=file:/dev/./urandom", \
+  "-jar", "app.jar"]
