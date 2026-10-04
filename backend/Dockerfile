@@ -19,7 +19,11 @@ USER pulse
 EXPOSE 8080
 
 ENTRYPOINT ["java", \
-  "-XX:MaxRAMPercentage=70", \
+  "-XX:MaxRAMPercentage=65", \
   "-XX:+UseSerialGC", \
+  "-XX:MaxMetaspaceSize=96m", \
+  "-XX:ReservedCodeCacheSize=32m", \
+  "-XX:MaxDirectMemorySize=32m", \
+  "-Xss512k", \
   "-Djava.security.egd=file:/dev/./urandom", \
   "-jar", "app.jar"]
