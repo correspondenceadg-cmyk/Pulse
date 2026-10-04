@@ -2,26 +2,22 @@ spring:
   application:
     name: pulse
 
+  main:
+    banner-mode: off
+    lazy-initialization: true
+
   datasource:
     url: ${DATABASE_URL}
     username: ${DATABASE_USER}
     password: ${DATABASE_PASSWORD}
     hikari:
       # Aiven free = 20 conn cap
-      maximum-pool-size: 5
+      maximum-pool-size: 3
       minimum-idle: 1
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
-
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    open-in-view: false
-    properties:
-      hibernate:
-        jdbc:
-          time_zone: UTC
+      pool-name: pulse-pool
 
   flyway:
     enabled: true
@@ -43,6 +39,12 @@ server:
     include-message: never
     include-stacktrace: never
     include-binding-errors: never
+  undertow:
+    threads:
+      io: 2
+      worker: 8
+    buffer-size: 8192
+    direct-buffers: false
 
 management:
   endpoints:
@@ -52,14 +54,20 @@ management:
   endpoint:
     health:
       show-details: never
+  health:
+    db:
+      enabled: true
 
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
   level:
-    root: INFO
-    dev.pulse: DEBUG
-    org.springframework.security: INFO
+    root: WARN
+    dev.pulse: INFO
+    org.springframework: WARN
+    org.springframework.security: WARN
+    com.zaxxer.hikari: WARN
+    org.flywaydb: INFO
 
 pulse:
   jwt:
