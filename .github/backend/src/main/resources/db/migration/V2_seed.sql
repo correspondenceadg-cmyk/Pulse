@@ -1,0 +1,5 @@
+-- Pulse — seed data
+-- Intentionally a no-op. Flyway migrations should not seed real data
+-- because they run in every environment including production.
+-- For local demo data, use a script (e.g. scripts/seed-dev.sql) that you
+-- apply manually with psql against a dev database.

@@ -1,0 +1,51 @@
+version: 2
+updates:
+  - package-ecosystem: maven
+    directory: /backend
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      spring:
+        patterns:
+          - 'org.springframework*'
+      test:
+        patterns:
+          - 'org.junit*'
+          - 'org.mockito*'
+          - 'org.testcontainers*'
+    labels: [deps, backend]
+
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      react:
+        patterns:
+          - 'react*'
+          - '@types/react*'
+      tooling:
+        patterns:
+          - 'vite*'
+          - 'vitest*'
+          - 'typescript'
+          - 'eslint*'
+    labels: [deps, frontend]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    labels: [deps, ci]
+
+  - package-ecosystem: docker
+    directory: /backend
+    schedule:
+      interval: weekly
+      day: monday
+    labels: [deps, docker]
