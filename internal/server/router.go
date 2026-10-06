@@ -9,6 +9,7 @@ import (
 	"github.com/correspondenceadg-cmyk/pulse/internal/config"
 	"github.com/correspondenceadg-cmyk/pulse/internal/events"
 	"github.com/correspondenceadg-cmyk/pulse/internal/httpx"
+	"github.com/correspondenceadg-cmyk/pulse/internal/votes"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -19,6 +20,7 @@ func NewRouter(
 	authHandlers *auth.Handlers,
 	authSvc *auth.Service,
 	eventHandlers *events.Handlers,
+	voteHandlers *votes.Handlers,
 ) http.Handler {
 	r := chi.NewRouter()
 
@@ -47,17 +49,24 @@ func NewRouter(
 		r.Post("/logout", authHandlers.Logout)
 	})
 
+	adapter := authAdapter{authSvc}
+
 	r.Route("/api/events", func(r chi.Router) {
 		r.Get("/", eventHandlers.List)
 		r.Get("/{id}", eventHandlers.Get)
 
+		r.With(func(next http.Handler) http.Handler {
+			return httpx.OptionalAuth(adapter, next)
+		}).Get("/{id}/stats", voteHandlers.Stats)
+
 		r.Group(func(r chi.Router) {
 			r.Use(func(next http.Handler) http.Handler {
-				return httpx.RequireAuth(authAdapter{authSvc}, next)
+				return httpx.RequireAuth(adapter, next)
 			})
 			r.Post("/", eventHandlers.Create)
 			r.Put("/{id}", eventHandlers.Update)
 			r.Delete("/{id}", eventHandlers.Delete)
+			r.Post("/{id}/vote", voteHandlers.Vote)
 		})
 	})
 

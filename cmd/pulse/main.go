@@ -15,6 +15,7 @@ import (
 	"github.com/correspondenceadg-cmyk/pulse/internal/db"
 	"github.com/correspondenceadg-cmyk/pulse/internal/events"
 	"github.com/correspondenceadg-cmyk/pulse/internal/server"
+	"github.com/correspondenceadg-cmyk/pulse/internal/votes"
 )
 
 func main() {
@@ -56,7 +57,11 @@ func run() error {
 	eventSvc := events.NewService(eventRepo)
 	eventHandlers := events.NewHandlers(eventSvc)
 
-	router := server.NewRouter(cfg, pool, authHandlers, authSvc, eventHandlers)
+	voteRepo := votes.NewRepository(pool)
+	voteSvc := votes.NewService(voteRepo)
+	voteHandlers := votes.NewHandlers(voteSvc)
+
+	router := server.NewRouter(cfg, pool, authHandlers, authSvc, eventHandlers, voteHandlers)
 
 	srv := &http.Server{
 		Addr:              ":" + cfg.Port,
