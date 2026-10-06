@@ -1,3 +1,3 @@
 module github.com/correspondenceadg-cmyk/pulse
 
-go 1.25
+go 1.26
