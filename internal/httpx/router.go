@@ -7,11 +7,18 @@ import (
 
 	"github.com/correspondenceadg-cmyk/pulse/internal/auth"
 	"github.com/correspondenceadg-cmyk/pulse/internal/config"
+	"github.com/correspondenceadg-cmyk/pulse/internal/events"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewRouter(cfg *config.Config, pool *pgxpool.Pool, authHandlers *auth.Handlers, authSvc *auth.Service) http.Handler {
+func NewRouter(
+	cfg *config.Config,
+	pool *pgxpool.Pool,
+	authHandlers *auth.Handlers,
+	authSvc *auth.Service,
+	eventHandlers *events.Handlers,
+) http.Handler {
 	r := chi.NewRouter()
 
 	r.Use(RequestID)
@@ -39,11 +46,17 @@ func NewRouter(cfg *config.Config, pool *pgxpool.Pool, authHandlers *auth.Handle
 		r.Post("/logout", authHandlers.Logout)
 	})
 
-	r.Route("/api", func(r chi.Router) {
+	r.Route("/api/events", func(r chi.Router) {
+		r.Get("/", eventHandlers.List)
+		r.Get("/{id}", eventHandlers.Get)
+
 		r.Group(func(r chi.Router) {
 			r.Use(func(next http.Handler) http.Handler {
 				return RequireAuth(authAdapter{authSvc}, next)
 			})
+			r.Post("/", eventHandlers.Create)
+			r.Put("/{id}", eventHandlers.Update)
+			r.Delete("/{id}", eventHandlers.Delete)
 		})
 	})
 
