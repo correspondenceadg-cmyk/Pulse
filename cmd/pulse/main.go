@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/correspondenceadg-cmyk/pulse/internal/config"
+	"github.com/correspondenceadg-cmyk/pulse/internal/db"
 	"github.com/correspondenceadg-cmyk/pulse/internal/httpx"
 )
 
@@ -32,7 +33,20 @@ func run() error {
 	}))
 	slog.SetDefault(logger)
 
-	router := httpx.NewRouter(cfg)
+	startupCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	pool, err := db.NewPool(startupCtx, cfg.DatabaseURL)
+	if err != nil {
+		return err
+	}
+	defer pool.Close()
+
+	if err := db.Migrate(startupCtx, pool); err != nil {
+		return err
+	}
+
+	router := httpx.NewRouter(cfg, pool)
 
 	srv := &http.Server{
 		Addr:              ":" + cfg.Port,
@@ -61,7 +75,7 @@ func run() error {
 		slog.Info("shutdown", "signal", sig.String())
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-	return srv.Shutdown(ctx)
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer shutdownCancel()
+	return srv.Shutdown(shutdownCtx)
 }
