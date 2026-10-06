@@ -10,8 +10,10 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/correspondenceadg-cmyk/pulse/internal/auth"
 	"github.com/correspondenceadg-cmyk/pulse/internal/config"
 	"github.com/correspondenceadg-cmyk/pulse/internal/db"
+	"github.com/correspondenceadg-cmyk/pulse/internal/events"
 	"github.com/correspondenceadg-cmyk/pulse/internal/httpx"
 )
 
@@ -46,7 +48,15 @@ func run() error {
 		return err
 	}
 
-	router := httpx.NewRouter(cfg, pool)
+	authRepo := auth.NewRepository(pool)
+	authSvc := auth.NewService(authRepo, cfg)
+	authHandlers := auth.NewHandlers(authSvc, cfg.Env == "production")
+
+	eventRepo := events.NewRepository(pool)
+	eventSvc := events.NewService(eventRepo)
+	eventHandlers := events.NewHandlers(eventSvc)
+
+	router := httpx.NewRouter(cfg, pool, authHandlers, authSvc, eventHandlers)
 
 	srv := &http.Server{
 		Addr:              ":" + cfg.Port,
