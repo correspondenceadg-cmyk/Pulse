@@ -12,24 +12,137 @@ body {
   min-height: 100dvh;
 }
 
-.app {
+#root { min-height: 100dvh; }
+
+.muted { color: #94a3b8; font-size: 0.9em; }
+
+.page-loading {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  color: #94a3b8;
+}
+
+.auth-page {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: 24px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 360px;
+  background: #1e293b;
+  padding: 28px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.auth-card h1 {
+  margin: 0;
+  font-size: 2em;
+  font-weight: 700;
+  background: linear-gradient(135deg, #60a5fa, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.auth-card p { margin: 0; }
+
+.auth-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-card label span {
+  font-size: 0.85em;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.auth-card input {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: inherit;
+  font: inherit;
+  font-size: 1em;
+}
+
+.auth-card input:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 1px;
+}
+
+.auth-card button {
+  background: #3b82f6;
+  color: white;
+  border: 0;
+  border-radius: 8px;
+  padding: 11px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-card button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.form-error {
+  background: rgba(239,68,68,0.12);
+  color: #fca5a5;
+  border: 1px solid rgba(239,68,68,0.3);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.9em;
+}
+
+.auth-card a { color: #60a5fa; }
+
+.page {
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
 }
 
-header {
-  padding: 1rem;
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
   border-bottom: 1px solid #1e293b;
 }
 
-header a {
-  color: #e2e8f0;
-  text-decoration: none;
-  font-weight: 600;
+.topbar h1 {
+  margin: 0;
+  font-size: 1.25em;
 }
 
-main {
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-actions button {
+  background: transparent;
+  border: 1px solid #334155;
+  color: inherit;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.page-body {
   flex: 1;
-  padding: 1rem;
+  padding: 16px;
 }
