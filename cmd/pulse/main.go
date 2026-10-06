@@ -14,6 +14,7 @@ import (
 	"github.com/correspondenceadg-cmyk/pulse/internal/config"
 	"github.com/correspondenceadg-cmyk/pulse/internal/db"
 	"github.com/correspondenceadg-cmyk/pulse/internal/events"
+	"github.com/correspondenceadg-cmyk/pulse/internal/polls"
 	"github.com/correspondenceadg-cmyk/pulse/internal/server"
 	"github.com/correspondenceadg-cmyk/pulse/internal/votes"
 )
@@ -61,7 +62,17 @@ func run() error {
 	voteSvc := votes.NewService(voteRepo)
 	voteHandlers := votes.NewHandlers(voteSvc)
 
-	router := server.NewRouter(cfg, pool, authHandlers, authSvc, eventHandlers, voteHandlers)
+	pollRepo := polls.NewRepository(pool)
+	pollSvc := polls.NewService(pollRepo)
+	pollHandlers := polls.NewHandlers(pollSvc)
+
+	router := server.NewRouter(
+		cfg, pool,
+		authHandlers, authSvc,
+		eventHandlers,
+		voteHandlers,
+		pollHandlers,
+	)
 
 	srv := &http.Server{
 		Addr:              ":" + cfg.Port,

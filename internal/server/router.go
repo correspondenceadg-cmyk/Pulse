@@ -9,6 +9,7 @@ import (
 	"github.com/correspondenceadg-cmyk/pulse/internal/config"
 	"github.com/correspondenceadg-cmyk/pulse/internal/events"
 	"github.com/correspondenceadg-cmyk/pulse/internal/httpx"
+	"github.com/correspondenceadg-cmyk/pulse/internal/polls"
 	"github.com/correspondenceadg-cmyk/pulse/internal/votes"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -21,6 +22,7 @@ func NewRouter(
 	authSvc *auth.Service,
 	eventHandlers *events.Handlers,
 	voteHandlers *votes.Handlers,
+	pollHandlers *polls.Handlers,
 ) http.Handler {
 	r := chi.NewRouter()
 
@@ -50,23 +52,33 @@ func NewRouter(
 	})
 
 	adapter := authAdapter{authSvc}
+	optional := func(next http.Handler) http.Handler { return httpx.OptionalAuth(adapter, next) }
+	required := func(next http.Handler) http.Handler { return httpx.RequireAuth(adapter, next) }
 
 	r.Route("/api/events", func(r chi.Router) {
 		r.Get("/", eventHandlers.List)
 		r.Get("/{id}", eventHandlers.Get)
-
-		r.With(func(next http.Handler) http.Handler {
-			return httpx.OptionalAuth(adapter, next)
-		}).Get("/{id}/stats", voteHandlers.Stats)
+		r.With(optional).Get("/{id}/stats", voteHandlers.Stats)
+		r.With(optional).Get("/{id}/polls", pollHandlers.List)
 
 		r.Group(func(r chi.Router) {
-			r.Use(func(next http.Handler) http.Handler {
-				return httpx.RequireAuth(adapter, next)
-			})
+			r.Use(required)
 			r.Post("/", eventHandlers.Create)
 			r.Put("/{id}", eventHandlers.Update)
 			r.Delete("/{id}", eventHandlers.Delete)
 			r.Post("/{id}/vote", voteHandlers.Vote)
+			r.Post("/{id}/polls", pollHandlers.Create)
+		})
+	})
+
+	r.Route("/api/polls", func(r chi.Router) {
+		r.With(optional).Get("/{id}/results", pollHandlers.Results)
+
+		r.Group(func(r chi.Router) {
+			r.Use(required)
+			r.Post("/{id}/open", pollHandlers.Open)
+			r.Post("/{id}/close", pollHandlers.Close)
+			r.Post("/{id}/vote", pollHandlers.Vote)
 		})
 	})
 
