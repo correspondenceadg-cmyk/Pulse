@@ -2,6 +2,8 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from './auth/useAuth';
 import { ProtectedRoute } from './auth/ProtectedRoute';
 import { MapPage } from './routes/MapPage';
+import { EventPage } from './routes/EventPage';
+import { PresenterPage } from './routes/PresenterPage';
 import { LoginPage } from './routes/LoginPage';
 import { RegisterPage } from './routes/RegisterPage';
 
@@ -21,6 +23,22 @@ export default function App() {
         element={
           <ProtectedRoute>
             <MapPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/event/:id"
+        element={
+          <ProtectedRoute>
+            <EventPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/poll/:id/present"
+        element={
+          <ProtectedRoute>
+            <PresenterPage />
           </ProtectedRoute>
         }
       />
