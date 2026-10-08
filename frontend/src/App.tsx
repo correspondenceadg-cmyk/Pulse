@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { useAuth } from './auth/AuthContext';
+import { useAuth } from './auth/useAuth';
 import { ProtectedRoute } from './auth/ProtectedRoute';
-import { HomePage } from './routes/HomePage';
+import { MapPage } from './routes/MapPage';
 import { LoginPage } from './routes/LoginPage';
 import { RegisterPage } from './routes/RegisterPage';
 
@@ -20,7 +20,7 @@ export default function App() {
         path="/"
         element={
           <ProtectedRoute>
-            <HomePage />
+            <MapPage />
           </ProtectedRoute>
         }
       />
